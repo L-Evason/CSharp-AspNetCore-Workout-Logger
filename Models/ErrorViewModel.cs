@@ -1,4 +1,4 @@
-namespace CSharp_AspNetCore_Example.Models;
+namespace CSharpAspNetCoreExample.Models;
 
 public class ErrorViewModel
 {

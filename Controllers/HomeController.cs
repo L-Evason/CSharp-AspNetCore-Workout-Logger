@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using CSharp_AspNetCore_Example.Models;
+using CSharpAspNetCoreExample.Models;
 
-namespace CSharp_AspNetCore_Example.Controllers;
+namespace CSharpAspNetCoreExample.Controllers;
 
 public class HomeController : Controller
 {
