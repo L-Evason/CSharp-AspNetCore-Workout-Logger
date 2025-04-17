@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CSharpAspNetCoreExample.Data;
 using ExerciseRoutine.Models;
+using ViewModels.ExerciseViewModel;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace CSharpAspNetCoreExample.Controllers
 {
@@ -44,9 +46,26 @@ namespace CSharpAspNetCoreExample.Controllers
         }
 
         // GET: Exercise/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var viewModel = new ExerciseViewModel
+            {
+                AvailableMuscles = await _context.Muscle
+                    .Select(m => new SelectListItem
+                    {
+                        Value = m.Id.ToString(),
+                        Text = m.Name
+                    })
+                    .ToListAsync(),
+                AvailableRoutines = await _context.Routine
+                    .Select(r => new SelectListItem
+                    {
+                        Value = r.Id.ToString(),
+                        Text = r.Name
+                    })
+                    .ToListAsync()
+            };
+            return View(viewModel);
         }
 
         // POST: Exercise/Create
@@ -54,15 +73,40 @@ namespace CSharpAspNetCoreExample.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] Exercise exercise)
+        public async Task<IActionResult> Create(ExerciseViewModel model)
         {
-            if (ModelState.IsValid)
+            // If not a valid model return the view
+            if (!ModelState.IsValid)
             {
-                _context.Add(exercise);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                model.AvailableMuscles = await _context.Muscle
+                    .Select(m => new SelectListItem { Value = m.Id.ToString(), Text = m.Name })
+                    .ToListAsync();
+                model.AvailableRoutines = await _context.Routine
+                    .Select(r => new SelectListItem { Value = r.Id.ToString(), Text = r.Name })
+                    .ToListAsync();
+
+                return View(model);
             }
-            return View(exercise);
+
+            var muscles = await _context.Muscle
+                .Where(m => model.SelectedMuscleIds.Contains(m.Id))
+                .ToListAsync();
+
+            var routines = await _context.Routine
+                .Where(r => model.SelectedRoutineIds.Contains(r.Id))
+                .ToListAsync();
+
+            var exercise = new Exercise
+            {
+                Name = model.Name,
+                Muscles = muscles,
+                Routines = routines
+            };
+
+            _context.Add(exercise);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Exercise/Edit/5

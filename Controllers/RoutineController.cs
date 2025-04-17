@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CSharpAspNetCoreExample.Data;
 using ExerciseRoutine.Models;
+using ViewModels.RoutineViewModel;
 
 namespace CSharpAspNetCoreExample.Controllers
 {
@@ -34,7 +35,10 @@ namespace CSharpAspNetCoreExample.Controllers
             }
 
             var routine = await _context.Routine
+                .Include(r => r.Exercises)
+                .Include(r => r.RoutineLogs)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (routine == null)
             {
                 return NotFound();
@@ -44,9 +48,20 @@ namespace CSharpAspNetCoreExample.Controllers
         }
 
         // GET: Routine/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var viewModel = new RoutineViewModel
+            {
+                AvailableExercises = await _context.Exercise
+                    .Select(e => new SelectListItem
+                    {
+                        Value = e.Id.ToString(),
+                        Text = e.Name
+                    })
+                    .ToListAsync()
+            };
+
+            return View(viewModel);
         }
 
         // POST: Routine/Create
@@ -54,15 +69,30 @@ namespace CSharpAspNetCoreExample.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] Routine routine)
-        {
-            if (ModelState.IsValid)
+        public async Task<IActionResult> Create(RoutineViewModel model)
+        {               
+            //  If not a valid model return the view
+            if (!ModelState.IsValid)
             {
-                _context.Add(routine);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                model.AvailableExercises = await _context.Muscle
+                    .Select(m => new SelectListItem { Value = m.Id.ToString(), Text = m.Name })
+                    .ToListAsync();
+
+                return View(model);
             }
-            return View(routine);
+
+            var exercise = await _context.Exercise
+                .Where(e => model.SelectedExerciseIds.Contains(e.Id))
+                .ToListAsync();
+
+            var routine = new Routine
+            {
+                Name = model.Name
+            };
+            _context.Add(routine);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Routine/Edit/5
@@ -73,12 +103,30 @@ namespace CSharpAspNetCoreExample.Controllers
                 return NotFound();
             }
 
-            var routine = await _context.Routine.FindAsync(id);
+            var routine = await _context.Routine
+                .Include(r => r.Exercises)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
             if (routine == null)
             {
                 return NotFound();
             }
-            return View(routine);
+
+            var allExercises = await _context.Exercise.ToListAsync();
+
+            var viewModel = new RoutineViewModel
+            {
+                Id = routine.Id,
+                Name = routine.Name,
+                SelectedExerciseIds = routine.Exercises.Select(e => e.Id).ToList(),
+                AvailableExercises = allExercises.Select(e => new SelectListItem
+                {
+                    Value = e.Id.ToString(),
+                    Text = e.Name
+                }).ToList()
+            };
+
+            return View(viewModel);
         }
 
         // POST: Routine/Edit/5
@@ -86,34 +134,50 @@ namespace CSharpAspNetCoreExample.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Routine routine)
+        public async Task<IActionResult> Edit(int id, RoutineViewModel model)
         {
-            if (id != routine.Id)
+            if (id != model.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(routine);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!RoutineExists(routine.Id))
+                // Re-populate AvailableExercises if returning to the view
+                model.AvailableExercises = await _context.Exercise
+                    .Select(e => new SelectListItem
                     {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                        Value = e.Id.ToString(),
+                        Text = e.Name
+                    }).ToListAsync();
+
+                return View(model);
             }
-            return View(routine);
+
+            var routine = await _context.Routine
+                .Include(r => r.Exercises)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (routine == null)
+                return NotFound();
+
+            // Update name
+            routine.Name = model.Name;
+
+            // Clear old exercises and add selected ones
+            routine.Exercises.Clear();
+
+            var selectedExercises = await _context.Exercise
+                .Where(e => model.SelectedExerciseIds.Contains(e.Id))
+                .ToListAsync();
+
+            foreach (var exercise in selectedExercises)
+            {
+                routine.Exercises.Add(exercise);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Routine/Delete/5

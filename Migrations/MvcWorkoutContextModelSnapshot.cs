@@ -54,9 +54,13 @@ namespace CSharpAspNetCoreExample.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Exercise");
                 });
@@ -77,6 +81,9 @@ namespace CSharpAspNetCoreExample.Migrations
 
                     b.HasIndex("GroupId");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Muscle");
                 });
 
@@ -87,6 +94,7 @@ namespace CSharpAspNetCoreExample.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -101,9 +109,13 @@ namespace CSharpAspNetCoreExample.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Routine");
                 });
@@ -145,8 +157,8 @@ namespace CSharpAspNetCoreExample.Migrations
                     b.Property<DateTime>("SetTimestamp")
                         .HasColumnType("TEXT");
 
-                    b.Property<float>("Weight")
-                        .HasColumnType("REAL");
+                    b.Property<decimal>("Weight")
+                        .HasColumnType("decimal(5, 2)");
 
                     b.HasKey("Id");
 

@@ -17,7 +17,35 @@
             @Html.DisplayFor(model => model.Name)
         </dd>
     </dl>
+    <h5>Exercises in @Model.Name</h5>
+    @if (Model.Exercises != null && Model.Exercises.Any())
+    {
+        <ul>
+            @foreach (var exercise in Model.Exercises)
+            {
+                <li>@exercise.Name</li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p><em>No exercises assigned to this routine.</em></p>
+    }
 </div>
+<h5>@Model.Name logs</h5>
+    @if (Model.RoutineLogs != null && Model.RoutineLogs.Any())
+    {
+        <ul>
+            @foreach (var log in Model.RoutineLogs)
+            {
+                <li>@log.DateLogged</li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p><em>Nothing logged</em></p>
+    }
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>

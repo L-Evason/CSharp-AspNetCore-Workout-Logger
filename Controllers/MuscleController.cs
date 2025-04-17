@@ -22,6 +22,7 @@ namespace CSharpAspNetCoreExample.Controllers
         // GET: Muscle
         public async Task<IActionResult> Index()
         {
+            ViewData["GroupId"] = new SelectList(_context.MuscleGroup, "Id", "Name");
             return View(await _context.Muscle.ToListAsync());
         }
 
@@ -46,6 +47,8 @@ namespace CSharpAspNetCoreExample.Controllers
         // GET: Muscle/Create
         public IActionResult Create()
         {
+            // Load MuscleGroups into view for Create.cshtml ViewBag.GroupId
+            ViewData["GroupId"] = new SelectList(_context.MuscleGroup, "Id", "Name");
             return View();
         }
 
@@ -62,6 +65,8 @@ namespace CSharpAspNetCoreExample.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            // If validation fails return MuscleGroup list
+            ViewData["GroupId"] = new SelectList(_context.MuscleGroup, "Id", "Name", muscle.GroupId);
             return View(muscle);
         }
 

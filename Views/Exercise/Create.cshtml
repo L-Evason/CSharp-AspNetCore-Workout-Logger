@@ -1,4 +1,5 @@
-@model ExerciseRoutine.Models.Exercise
+@using ViewModels.ExerciseViewModel;
+@model ExerciseViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -9,17 +10,22 @@
 <h4>Exercise</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="col-md-4"> 
+        <form asp-action="Create" method="post">
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
+                <label asp-for="Name"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <label>Muslces</label>
+                <select asp-for="SelectedMuscleIds" asp-items="Model.AvailableMuscles" multiple class="form-control"></select>
             </div>
+            <div class="form-group">
+                <label>Routines</label>
+                <select asp-for="SelectedRoutineIds" asp-items="Model.AvailableRoutines" multiple class="form-control"></select>
+            </div>
+            <button type="submit" class="btn btn-primary">Create</button>
         </form>
     </div>
 </div>

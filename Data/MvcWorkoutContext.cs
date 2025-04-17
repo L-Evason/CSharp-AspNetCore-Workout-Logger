@@ -30,6 +30,10 @@ namespace CSharpAspNetCoreExample.Data
                 .WithMany(g => g.Muscles)
                 .HasForeignKey(m => m.GroupId);
 
+            modelBuilder.Entity<Muscle>()
+                .HasIndex(m => m.Name)
+                .IsUnique();
+
             modelBuilder.Entity<Exercise>()
                 .HasMany(e => e.Muscles)
                 .WithMany(m => m.Exercises)
@@ -39,6 +43,14 @@ namespace CSharpAspNetCoreExample.Data
                 .HasMany(e => e.Routines)
                 .WithMany(r => r.Exercises)
                 .UsingEntity(j => j.ToTable("RoutineExercises"));
+
+            modelBuilder.Entity<Exercise>()
+                .HasIndex(e => e.Name)
+                .IsUnique();
+
+            modelBuilder.Entity<Routine>()
+                .HasIndex(r => r.Name)
+                .IsUnique();
 
             modelBuilder.Entity<RoutineLog>()
                 .HasOne(rl => rl.Routine)
