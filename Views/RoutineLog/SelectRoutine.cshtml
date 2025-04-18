@@ -1,0 +1,19 @@
+@using ViewModels.RoutineSelectViewModel;
+@model RoutineSelectViewModel
+
+@{
+    ViewData["Title"] = "SelectRoutine";
+}
+
+<h2>Select a Routine to Log</h2>
+
+<form asp-action="SelectRoutine" method="post">
+    <div class="form-group">
+        <label asp-for="RoutineId" class="control-label"></label>
+        <select asp-for="RoutineId" class="form-control" asp-items="Model.AvailableRoutines">
+            <option value="">-- Select a Routine --</option>
+        </select>
+        <span asp-validation-for="RoutineId" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Start Logging</button>
+</form>

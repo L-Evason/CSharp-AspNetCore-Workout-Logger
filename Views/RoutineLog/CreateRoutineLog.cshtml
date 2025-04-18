@@ -1,0 +1,18 @@
+@using ViewModels.RoutineLogCreateViewModel;
+@model RoutineLogCreateViewModel
+
+@{
+    ViewData["Title"] = "CreateRoutineLog";
+}
+
+<h2>Select a Routine to Log</h2>
+
+<div>
+    <form asp-action="CreateRoutineLog" method="post">
+        <h3>@Model.RoutineName</h3>
+        <label>Date:</label>
+        <input asp-for="DateLogged" type="date" />
+        <input type="hidden" asp-for="RoutineId" />
+        <button type="submit">Begin Logging</button>
+    </form>
+</div>

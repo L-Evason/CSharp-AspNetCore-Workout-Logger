@@ -1,0 +1,24 @@
+@using ViewModels.ExerciseLogViewModel;
+@model ExerciseLogViewModel
+
+@{
+    ViewData["Title"] = "LogExercise";
+}
+
+<h3>Logging: @Model.ExerciseName</h3>
+
+<form asp-action="LogExercise" method="post">
+    <input type="hidden" asp-for="ExerciseId" />
+    <input type="hidden" asp-for="RoutineLogId" />
+
+    @for (int i = 0; i < Model.SetLogs.Count; i++)
+    {
+        <div>
+            <label>Set @(i + 1)</label>
+            <input asp-for="SetLogs[@i].Reps" placeholder="Reps" />
+            <input asp-for="SetLogs[@i].Weight" placeholder="Weight" />
+        </div>
+    }
+
+    <button type="submit">Save and Next</button>
+</form>
