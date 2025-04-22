@@ -138,7 +138,9 @@ namespace CSharpAspNetCoreExample.Controllers
         // GET: RoutineLog
         public async Task<IActionResult> Index()
         {
-            return View(await _context.RoutineLog.ToListAsync());
+            return View(await _context.RoutineLog
+                .Include(l => l.Routine)
+                .ToListAsync());
         }
 
         // GET: RoutineLog/Details/5
@@ -150,7 +152,10 @@ namespace CSharpAspNetCoreExample.Controllers
             }
 
             var routineLog = await _context.RoutineLog
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(l => l.Routine)
+                .Include(l => l.SetLogs)
+                    .ThenInclude(sl => sl.Exercise)
+                .FirstOrDefaultAsync(l => l.Id == id);
             if (routineLog == null)
             {
                 return NotFound();

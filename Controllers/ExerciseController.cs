@@ -36,6 +36,7 @@ namespace CSharpAspNetCoreExample.Controllers
             }
 
             var exercise = await _context.Exercise
+                .Include(e => e.Muscles)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (exercise == null)
             {

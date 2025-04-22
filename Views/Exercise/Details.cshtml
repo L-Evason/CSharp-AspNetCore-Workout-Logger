@@ -17,6 +17,20 @@
             @Html.DisplayFor(model => model.Name)
         </dd>
     </dl>
+@if(Model.Muscles is not null)
+{   
+    <h5>Associated muscles</h5>
+    <ul>
+    @foreach(var muscle in Model.Muscles)
+    {
+        <li>@muscle.Name</li>
+    }
+    </ul>
+}
+@if(Model.Muscles is null)
+{
+    <a>No muscles assosiated with this exercise</a>
+}
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |

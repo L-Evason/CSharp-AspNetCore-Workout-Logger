@@ -130,7 +130,6 @@ namespace CSharpAspNetCoreExample.Controllers
             {
                 return NotFound();
             }
-
             return View(setLog);
         }
 

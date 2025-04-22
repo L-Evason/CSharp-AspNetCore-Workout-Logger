@@ -39,6 +39,7 @@
             @foreach (var log in Model.RoutineLogs)
             {
                 <li>@log.DateLogged</li>
+                <a asp-controller="RoutineLog" asp-action="Details" asp-route-id="@log.Id">View workout log</a>
             }
         </ul>
     }
